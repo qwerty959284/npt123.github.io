@@ -53,7 +53,7 @@
         </div>
 
         <div class="header">
-<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTI1NiA4QzExOSA4IDggMTE5IDggMjU2czExMSAyNDggMjQ4IDI0OCAyNDgtMTExIDI0OC0yNDhTMzkzIDggMjU2IDh6bTAgNDQ4Yy0xMTAuNSAwLTIwMC04OS41LTIwMC0yMDBTMTQ1LjUgNTYgMjU2IDU2czIwMCA4OS41IDIwMCAyMDAtODkuNSAyMDAtMjAwIDIwMHptMzMuOC0zMTkuNGMtMTAuMi0xMC4yLTI3LTEwLjItMzcuMiAwTDE2MCAzNTguN2wtMjguOC0yOC44Yy0xMC4yLTEwLjItMjctMTAuMi0zNy4yIDAtMTAuMiAxMC4yLTEwLjIgMjcgMCAzNy4ybDU2LjQgNTYuNGM1LjEgNS4xIDExLjggNy44IDE4LjkgNy44czEzLjgtMi43IDE4LjktNy44bDEyOC0xMjhjMTAuMi0xMC4yIDEwLjItMjcgMC0zNy4yeiIvPjwvc3ZnPg==" alt="Shield">
+            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTI1NiA4QzExOSA4IDggMTE5IDggMjU2czExMSAyNDggMjQ4IDI0OCAyNDgtMTExIDI0OC0yNDhTMzkzIDggMjU2IDh6bTAgNDQ4Yy0xMTAuNSAwLTIwMC04OS41LTIwMC0yMDBTMTQ1LjUgNTYgMjU2IDU2czIwMCA4OS41IDIwMCAyMDAtODkuNSAyMDAtMjAwIDIwMHptMzMuOC0zMTkuNGMtMTAuMi0xMC4yLTI3LTEwLjItMzcuMiAwTDE2MCAzNTguN2wtMjguOC0yOC44Yy0xMC4yLTEwLjItMjctMTAuMi0zNy4yIDAtMTAuMiAxMC4yLTEwLjIgMjcgMCAzNy4ybDU2LjQgNTYuNGM1LjEgNS4xIDExLjggNy44IDE4LjkgNy44czEzLjgtMi43IDE4LjktNy44bDEyOC0xMjhjMTAuMi0xMC4yIDEwLjItMjcgMC0zNy4yeiIvPjwvc3ZnPg==" alt="Shield">
             <h2>CC扫描 - 系统安全检测</h2>
         </div>
 
@@ -128,7 +128,6 @@
     </div>
 
     <script>
-        // 禁止右键菜单
         document.addEventListener('contextmenu', function(e) {
             e.preventDefault();
             const contextMenu = document.getElementById('context-menu');
@@ -137,7 +136,6 @@
             contextMenu.style.top = e.pageY + 'px';
         });
 
-        // 点击其他地方隐藏右键菜单
         document.addEventListener('click', function() {
             document.getElementById('context-menu').style.display = 'none';
             document.getElementById('settings-menu').style.display = 'none';
@@ -145,6 +143,7 @@
 
         const hasInstalledCCNB=localStorage.getItem('ccnbInstalled')==='true';
         const hasFixedThreats=localStorage.getItem('threatsFixed')==='true';
+        const hasScannedOnce=localStorage.getItem('hasScannedOnce')==='true';
         const files=["系统核心/kernel32.dll","程序文件/system.dll","用户文档/财务报告.xlsx","下载/game_mod.exe","系统驱动/network.sys","启动项/startup.dll","图片/证件照.jpg","音乐/个人录音.mp3","系统配置/SYSTEM","桌面/重要文件.doc"];
         const threats=["Trojan.Generic","Backdoor.Bladabindi","Exploit.LSASS","Vulnerability.CVE-2023","Ransomware.Cry","Spyware.Keylogger","Adware.Popup","Virus.Neshta","Worm.Network","Rootkit.TDSS"];
         const ccnbFiles=["CCNB_Core.sys","CCNB_Security.exe","ThreatDefinitions.db","RealTimeProtection.dll","FirewallEngine.exe","UI_Components","Configuration","ResourcePack"];
@@ -227,6 +226,7 @@
             try {
                 localStorage.removeItem('ccnbInstalled');
                 localStorage.removeItem('threatsFixed');
+                localStorage.removeItem('hasScannedOnce');
                 
                 resetAlert.style.display='block';
                 criticalAlert.style.display='none';
@@ -265,6 +265,10 @@
             fixBtn.style.display='none';
             rescanBtn.style.display='none';
             resetBtn.style.display='none';
+            
+            // 标记为已扫描过
+            localStorage.setItem('hasScannedOnce', 'true');
+            
             let progressValue=0;
             const interval=setInterval(()=>{
                 progressValue+=Math.random()*5;
@@ -279,9 +283,12 @@
                 }else{
                     statusText.textContent="完成安全检查...";
                 }
-                if(!hasFixedThreats&&progressValue>20&&progressValue<90&&Math.random()>0.7){
+                
+                // 如果已经扫描过一次，就不再显示病毒
+                if(!hasScannedOnce && !hasFixedThreats && progressValue>20 && progressValue<90 && Math.random()>0.7){
                     addScanResult(false);
                 }
+                
                 if(progressValue===100){
                     clearInterval(interval);
                     completeScan();
@@ -290,7 +297,7 @@
         }
 
         function addScanResult(isCleaned){
-            const isThreat=!hasFixedThreats&&Math.random()>0.4;
+            const isThreat=!hasScannedOnce && !hasFixedThreats && Math.random()>0.4;
             const randomFile=files[Math.floor(Math.random()*files.length)];
             const randomThreat=threats[Math.floor(Math.random()*threats.length)];
             const item=document.createElement('div');
@@ -310,7 +317,8 @@
 
         function completeScan(){
             statusText.textContent="扫描完成！";
-            if(hasFixedThreats){
+            
+            if(hasFixedThreats || hasScannedOnce){
                 cleanAlert.style.display='block';
                 systemClean.style.display='block';
                 rescanBtn.style.display='inline-block';
