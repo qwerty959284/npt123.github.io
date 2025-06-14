@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CC扫描 - 系统安全检测</title>
     <style>
-        body{font-family:'Segoe UI',Arial,sans-serif;background-color:#f0f0f0;margin:0;padding:0;color:#333}
+        body{font-family:'Segoe UI',Arial,sans-serif;background-color:#f0f0f0;margin:0;padding:0;color:#333;user-select:none}
         .scanner-container{width:80%;max-width:800px;margin:50px auto;background-color:white;border-radius:5px;box-shadow:0 0 15px rgba(0,0,0,0.1);padding:20px;overflow:hidden;position:relative}
         .header{background-color:#3498db;color:white;padding:15px;margin:-20px -20px 20px -20px;display:flex;align-items:center}
         .header img{height:30px;margin-right:10px}
@@ -36,9 +36,16 @@
         .settings-menu{display:none;position:absolute;top:50px;right:20px;background:white;border-radius:5px;box-shadow:0 0 10px rgba(0,0,0,0.1);padding:10px;z-index:100}
         .settings-menu button{display:block;width:100%;padding:8px 12px;text-align:left;background:none;border:none;cursor:pointer}
         .settings-menu button:hover{background-color:#f5f5f5}
+        #context-menu{display:none;position:fixed;background:white;border:1px solid #ddd;box-shadow:0 2px 5px rgba(0,0,0,0.2);z-index:1000}
+        #context-menu button{display:block;width:100%;padding:8px 15px;text-align:left;background:none;border:none;cursor:pointer}
+        #context-menu button:hover{background-color:#f5f5f5}
     </style>
 </head>
-<body>
+<body oncontextmenu="return false;">
+    <div id="context-menu">
+        <button onclick="alert('右键功能已被禁用')">CCNB安全扫描</button>
+    </div>
+
     <div class="scanner-container" id="scanner-ui">
         <button class="settings-btn" id="settings-btn">⚙️</button>
         <div class="settings-menu" id="settings-menu">
@@ -46,7 +53,7 @@
         </div>
 
         <div class="header">
-            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTI1NiA4QzExOSA4IDggMTE5IDggMjU2czExMSAyNDggMjQ4IDI0OCAyNDgtMTExIDI0OC0yNDhTMzkzIDggMjU2IDh6bTAgNDQ4Yy0xMTAuNSAwLTIwMC04OS41LTIwMC0yMDBTMTQ1LjUgNTYgMjU2IDU2czIwMCA4OS41IDIwMCAyMDAtODkuNSAyMDAtMjAwIDIwMHptMzMuOC0zMTkuNGMtMTAuMi0xMC4yLTI3LTEwLjItMzcuMiAwTDE2MCAzNTguN2wtMjguOC0yOC44Yy0xMC4yLTEwLjItMjctMTAuMi0zNy4yIDAtMTAuMiAxMC4yLTEwLjIgMjcgMCAzNy4ybDU2LjQgNTYuNGM1LjEgNS4xIDExLjggNy44IDE4LjkgNy44czEzLjgtMi43IDE4LjktNy44bDEyOC0xMjljMTAuMi0xMC4yIDEwLjItMjcgMC0zNy4yeiIvPjwvc3ZnPg==" alt="Shield">
+<img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTI1NiA4QzExOSA4IDggMTE5IDggMjU2czExMSAyNDggMjQ4IDI0OCAyNDgtMTExIDI0OC0yNDhTMzkzIDggMjU2IDh6bTAgNDQ4Yy0xMTAuNSAwLTIwMC04OS41LTIwMC0yMDBTMTQ1LjUgNTYgMjU2IDU2czIwMCA4OS41IDIwMCAyMDAtODkuNSAyMDAtMjAwIDIwMHptMzMuOC0zMTkuNGMtMTAuMi0xMC4yLTI3LTEwLjItMzcuMiAwTDE2MCAzNTguN2wtMjguOC0yOC44Yy0xMC4yLTEwLjItMjctMTAuMi0zNy4yIDAtMTAuMiAxMC4yLTEwLjIgMjcgMCAzNy4ybDU2LjQgNTYuNGM1LjEgNS4xIDExLjggNy44IDE4LjkgNy44czEzLjgtMi43IDE4LjktNy44bDEyOC0xMjhjMTAuMi0xMC4yIDEwLjItMjcgMC0zNy4yeiIvPjwvc3ZnPg==" alt="Shield">
             <h2>CC扫描 - 系统安全检测</h2>
         </div>
 
@@ -121,6 +128,21 @@
     </div>
 
     <script>
+        // 禁止右键菜单
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            const contextMenu = document.getElementById('context-menu');
+            contextMenu.style.display = 'block';
+            contextMenu.style.left = e.pageX + 'px';
+            contextMenu.style.top = e.pageY + 'px';
+        });
+
+        // 点击其他地方隐藏右键菜单
+        document.addEventListener('click', function() {
+            document.getElementById('context-menu').style.display = 'none';
+            document.getElementById('settings-menu').style.display = 'none';
+        });
+
         const hasInstalledCCNB=localStorage.getItem('ccnbInstalled')==='true';
         const hasFixedThreats=localStorage.getItem('threatsFixed')==='true';
         const files=["系统核心/kernel32.dll","程序文件/system.dll","用户文档/财务报告.xlsx","下载/game_mod.exe","系统驱动/network.sys","启动项/startup.dll","图片/证件照.jpg","音乐/个人录音.mp3","系统配置/SYSTEM","桌面/重要文件.doc"];
@@ -189,10 +211,6 @@
         settingsBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             settingsMenu.style.display = settingsMenu.style.display === 'block' ? 'none' : 'block';
-        });
-
-        document.addEventListener('click', function() {
-            settingsMenu.style.display = 'none';
         });
 
         clearDataBtn.addEventListener('click', function(e) {
