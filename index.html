@@ -6,7 +6,7 @@
     <title>CC扫描 - 系统安全检测</title>
     <style>
         body{font-family:'Segoe UI',Arial,sans-serif;background-color:#f0f0f0;margin:0;padding:0;color:#333}
-        .scanner-container{width:80%;max-width:800px;margin:50px auto;background-color:white;border-radius:5px;box-shadow:0 0 15px rgba(0,0,0,0.1);padding:20px;overflow:hidden}
+        .scanner-container{width:80%;max-width:800px;margin:50px auto;background-color:white;border-radius:5px;box-shadow:0 0 15px rgba(0,0,0,0.1);padding:20px;overflow:hidden;position:relative}
         .header{background-color:#3498db;color:white;padding:15px;margin:-20px -20px 20px -20px;display:flex;align-items:center}
         .header img{height:30px;margin-right:10px}
         .progress-container{margin:20px 0}
@@ -19,21 +19,32 @@
         .btn{background-color:#3498db;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;font-size:16px;margin-top:20px}
         .btn-danger{background-color:#e74c3c}
         .btn-success{background-color:#2ecc71}
+        .btn-warning{background-color:#f39c12}
         .loading{display:inline-block;width:20px;height:20px;border:3px solid rgba(255,255,255,.3);border-radius:50%;border-top-color:#fff;animation:spin 1s ease-in-out infinite}
         @keyframes spin{to{transform:rotate(360deg)}}
         .alert{padding:15px;border-radius:5px;margin:20px 0;border:1px solid transparent}
         .alert-danger{background-color:#f8d7da;color:#721c24;border-color:#f5c6cb}
         .alert-info{background-color:#d1ecf1;color:#0c5460;border-color:#bee5eb}
         .alert-success{background-color:#d4edda;color:#155724;border-color:#c3e6cb}
+        .alert-warning{background-color:#fff3cd;color:#856404;border-color:#ffeeba}
         .ccnb-required{display:none;text-align:center;padding:20px}
         .ccnb-logo{width:100px;height:100px;margin:20px auto;background-color:#2ecc71;border-radius:20px;display:flex;align-items:center;justify-content:center;color:white;font-size:24px;font-weight:bold}
         .system-clean{text-align:center;padding:20px;color:#2ecc71;font-size:18px}
         .refresh-message{text-align:center;padding:15px;margin:20px 0;background-color:#f8f9fa;border-radius:5px;border:1px solid #ddd}
         .key-input{margin:15px 0;padding:10px;width:100%;border:1px solid #ddd;border-radius:4px}
+        .settings-btn{position:absolute;top:20px;right:20px;background:transparent;border:none;color:#7f8c8d;cursor:pointer;font-size:24px}
+        .settings-menu{display:none;position:absolute;top:50px;right:20px;background:white;border-radius:5px;box-shadow:0 0 10px rgba(0,0,0,0.1);padding:10px;z-index:100}
+        .settings-menu button{display:block;width:100%;padding:8px 12px;text-align:left;background:none;border:none;cursor:pointer}
+        .settings-menu button:hover{background-color:#f5f5f5}
     </style>
 </head>
 <body>
     <div class="scanner-container" id="scanner-ui">
+        <button class="settings-btn" id="settings-btn">⚙️</button>
+        <div class="settings-menu" id="settings-menu">
+            <button id="clear-data-btn">清除所有使用信息</button>
+        </div>
+
         <div class="header">
             <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTI1NiA4QzExOSA4IDggMTE5IDggMjU2czExMSAyNDggMjQ4IDI0OCAyNDgtMTExIDI0OC0yNDhTMzkzIDggMjU2IDh6bTAgNDQ4Yy0xMTAuNSAwLTIwMC04OS41LTIwMC0yMDBTMTQ1LjUgNTYgMjU2IDU2czIwMCA4OS41IDIwMCAyMDAtODkuNSAyMDAtMjAwIDIwMHptMzMuOC0zMTkuNGMtMTAuMi0xMC4yLTI3LTEwLjItMzcuMiAwTDE2MCAzNTguN2wtMjguOC0yOC44Yy0xMC4yLTEwLjItMjctMTAuMi0zNy4yIDAtMTAuMiAxMC4yLTEwLjIgMjcgMCAzNy4ybDU2LjQgNTYuNGM1LjEgNS4xIDExLjggNy44IDE4LjkgNy44czEzLjgtMi43IDE4LjktNy44bDEyOC0xMjljMTAuMi0xMC4yIDEwLjItMjcgMC0zNy4yeiIvPjwvc3ZnPg==" alt="Shield">
             <h2>CC扫描 - 系统安全检测</h2>
@@ -55,6 +66,11 @@
         <div class="alert alert-success" id="clean-alert" style="display:none">
             <h3>✓ 系统安全</h3>
             <p>未检测到安全威胁，您的系统是安全的。</p>
+        </div>
+
+        <div class="alert alert-warning" id="reset-alert" style="display:none">
+            <h3>信息已清除</h3>
+            <p>所有使用信息已成功清除，请刷新页面。</p>
         </div>
 
         <div class="scan-details" id="scan-details"></div>
@@ -79,6 +95,7 @@
         <button class="btn" id="start-btn">开始扫描</button>
         <button class="btn btn-danger" id="fix-btn" style="display:none">立即修复威胁</button>
         <button class="btn" id="rescan-btn" style="display:none">重新扫描</button>
+        <button class="btn btn-warning" id="reset-btn" style="display:none">清除使用信息</button>
     </div>
 
     <div class="scanner-container" id="ccnb-installer" style="display:none">
@@ -114,6 +131,7 @@
         const startBtn=document.getElementById('start-btn');
         const fixBtn=document.getElementById('fix-btn');
         const rescanBtn=document.getElementById('rescan-btn');
+        const resetBtn=document.getElementById('reset-btn');
         const installCcnbBtn=document.getElementById('install-ccnb');
         const ccnbCompleteBtn=document.getElementById('ccnb-complete-btn');
         const progress=document.getElementById('progress');
@@ -124,6 +142,7 @@
         const ccnbFileProgress=document.getElementById('ccnb-file-progress');
         const criticalAlert=document.getElementById('critical-alert');
         const cleanAlert=document.getElementById('clean-alert');
+        const resetAlert=document.getElementById('reset-alert');
         const systemClean=document.getElementById('system-clean');
         const refreshMessage=document.getElementById('refresh-message');
         const alertText=document.getElementById('alert-text');
@@ -131,10 +150,14 @@
         const scannerUI=document.getElementById('scanner-ui');
         const ccnbInstaller=document.getElementById('ccnb-installer');
         const activationKey=document.getElementById('activation-key');
+        const settingsBtn=document.getElementById('settings-btn');
+        const settingsMenu=document.getElementById('settings-menu');
+        const clearDataBtn=document.getElementById('clear-data-btn');
 
         function initUI(){
             criticalAlert.style.display='none';
             cleanAlert.style.display='none';
+            resetAlert.style.display='none';
             systemClean.style.display='none';
             ccnbRequired.style.display='none';
             refreshMessage.style.display='none';
@@ -146,19 +169,63 @@
                     rescanBtn.style.display='inline-block';
                     startBtn.style.display='none';
                     fixBtn.style.display='none';
+                    resetBtn.style.display='inline-block';
                 }else{
                     startBtn.style.display='inline-block';
                     fixBtn.style.display='none';
                     rescanBtn.style.display='none';
+                    resetBtn.style.display='inline-block';
                 }
             }else{
                 startBtn.style.display='inline-block';
                 fixBtn.style.display='none';
                 rescanBtn.style.display='none';
+                resetBtn.style.display='none';
             }
         }
 
         initUI();
+
+        settingsBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            settingsMenu.style.display = settingsMenu.style.display === 'block' ? 'none' : 'block';
+        });
+
+        document.addEventListener('click', function() {
+            settingsMenu.style.display = 'none';
+        });
+
+        clearDataBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            clearUserData();
+            settingsMenu.style.display = 'none';
+        });
+
+        resetBtn.addEventListener('click', function() {
+            clearUserData();
+        });
+
+        function clearUserData() {
+            try {
+                localStorage.removeItem('ccnbInstalled');
+                localStorage.removeItem('threatsFixed');
+                
+                resetAlert.style.display='block';
+                criticalAlert.style.display='none';
+                cleanAlert.style.display='none';
+                systemClean.style.display='none';
+                ccnbRequired.style.display='none';
+                refreshMessage.style.display='none';
+                scanDetails.innerHTML='';
+                startBtn.style.display='inline-block';
+                fixBtn.style.display='none';
+                rescanBtn.style.display='none';
+                resetBtn.style.display='none';
+                
+            } catch (error) {
+                alert('清除失败: ' + error.message);
+            }
+        }
 
         startBtn.addEventListener('click',startScan);
         fixBtn.addEventListener('click',fixThreats);
@@ -172,12 +239,14 @@
             startBtn.innerHTML='<span class="loading"></span> 扫描中...';
             criticalAlert.style.display='none';
             cleanAlert.style.display='none';
+            resetAlert.style.display='none';
             systemClean.style.display='none';
             ccnbRequired.style.display='none';
             refreshMessage.style.display='none';
             scanDetails.innerHTML='';
             fixBtn.style.display='none';
             rescanBtn.style.display='none';
+            resetBtn.style.display='none';
             let progressValue=0;
             const interval=setInterval(()=>{
                 progressValue+=Math.random()*5;
@@ -228,6 +297,7 @@
                 systemClean.style.display='block';
                 rescanBtn.style.display='inline-block';
                 rescanBtn.disabled=false;
+                resetBtn.style.display='inline-block';
                 scanDetails.innerHTML='';
                 for(let i=0;i<files.length;i++){
                     const item=document.createElement('div');
@@ -241,14 +311,17 @@
                     systemClean.style.display='block';
                     rescanBtn.style.display='inline-block';
                     rescanBtn.disabled=false;
+                    resetBtn.style.display='inline-block';
                 }else{
                     criticalAlert.style.display='block';
                     if(hasInstalledCCNB){
                         fixBtn.style.display='inline-block';
                         startBtn.style.display='none';
+                        resetBtn.style.display='inline-block';
                     }else{
                         ccnbRequired.style.display='block';
                         startBtn.style.display='none';
+                        resetBtn.style.display='none';
                     }
                 }
             }
@@ -273,6 +346,7 @@
                 fixBtn.style.display='none';
                 rescanBtn.style.display='inline-block';
                 rescanBtn.disabled=false;
+                resetBtn.style.display='inline-block';
             },2000);
         }
 
@@ -327,6 +401,7 @@
             startBtn.style.display='none';
             fixBtn.style.display='none';
             rescanBtn.style.display='none';
+            resetBtn.style.display='none';
             refreshMessage.style.display='block';
         }
     </script>
