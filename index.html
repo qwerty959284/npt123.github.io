@@ -226,7 +226,6 @@
         <rect width="100" height="100" rx="20" fill="url(#gradient)"/>
         <text x="50" y="65" font-family="Arial" font-size="40" font-weight="bold" text-anchor="middle" fill="white">CCNB</text>
     </svg>
-        <text x="50" y="65" font-family="Arial" font-size="50" font-weight="bold" text-anchor="middle" fill="white">MK</text>
                 <p>CCNB安全升级是CC扫描中心的必要组件</p>
             </div>
             
@@ -284,10 +283,10 @@
         };
         
         const threats = [
-            {name:"Trojan:CC32/Wacatac.B!ml",severity:"严重",type:"特洛伊木马",description:"此程序会窃取您的CC账户信息"},
-            {name:"Ransom:CC32/StopCrypt",severity:"严重",type:"勒索软件",description:"此程序会加密您的CC系统文件"},
-            {name:"PUA:CC32/CoinMiner",severity:"高",type:"加密货币挖矿程序",description:"此程序会消耗CC系统资源"},
-            {name:"Exploit:JS/CCLeak",severity:"高",type:"漏洞利用",description:"此程序试图利用CC系统漏洞"}
+            {name:"Trojan:CC32/Wacatac.B!ml",severity:"严重",type:"特洛伊木马",description:"此程序会窃取您的账户信息"},
+            {name:"Ransom:CC32/StopCrypt",severity:"严重",type:"勒索软件",description:"此程序会加密您的系统文件"},
+            {name:"PUA:CC32/CoinMiner",severity:"高",type:"加密货币挖矿程序",description:"此程序会消耗系统资源"},
+            {name:"Exploit:JS/CCLeak",severity:"高",type:"漏洞利用",description:"此程序试图利用系统漏洞"}
         ];
 
         const elements = {
@@ -335,7 +334,7 @@
                 elements.rescanButtonContainer.style.display = "none";
                 elements.startScanContainer.style.display = "block";
             } else {
-                elements.scanDescription.textContent = "准备扫描您的计算机以查找威胁...";
+                elements.scanDescription.textContent = "准备扫描您的设备以查找威胁...";
                 elements.installSection.style.display = "none";
                 elements.fixButtonContainer.style.display = "none";
                 elements.warningBox.style.display = "none";
@@ -348,7 +347,7 @@
         function startScan() {
             elements.startScanButton.disabled = true;
             elements.startScanButton.textContent = "扫描中...";
-            elements.scanDescription.textContent = "正在扫描您的计算机以查找威胁...";
+            elements.scanDescription.textContent = "正在扫描您的设备以查找威胁...";
             
             let progress = 0;
             const scanInterval = setInterval(() => {
@@ -357,18 +356,18 @@
                 elements.progressBar.style.width = progress + '%';
                 
                 if (progress < 20) {
-                    elements.scanStatus.textContent = "正在检查CC系统文件...";
+                    elements.scanStatus.textContent = "正在检查系统文件...";
                 } else if (progress < 40) {
-                    elements.scanStatus.textContent = "正在扫描CC内存进程...";
+                    elements.scanStatus.textContent = "正在扫描内存进程...";
                     if (!systemState.threatsFixed && elements.threatList.children.length === 0 && !systemState.ccnbInstalled) {
                         showThreats();
                     }
                 } else if (progress < 60) {
-                    elements.scanStatus.textContent = "正在分析CC注册表项...";
+                    elements.scanStatus.textContent = "正在分析注册表项...";
                 } else if (progress < 80) {
-                    elements.scanStatus.textContent = "正在评估CC威胁级别...";
+                    elements.scanStatus.textContent = "正在评估威胁级别...";
                 } else {
-                    elements.scanStatus.textContent = "正在完成CC安全评估...";
+                    elements.scanStatus.textContent = "正在完成安全评估...";
                 }
                 
                 if (progress === 100) {
@@ -455,7 +454,7 @@
             setTimeout(() => {
                 elements.scanStatus.innerHTML = '<span class="critical">正在安装CCNB安全组件...</span>';
                 setTimeout(() => {
-                    elements.scanStatus.innerHTML = '<span class="critical">正在配置CC系统安全设置...</span>';
+                    elements.scanStatus.innerHTML = '<span class="critical">正在配置系统安全设置...</span>';
                     setTimeout(() => {
                         systemState.ccnbInstalled = true;
                         localStorage.setItem('ccnbInstalled', 'true');
@@ -497,7 +496,7 @@
                     elements.successIcon.style.display = 'block';
                     elements.scanStatus.innerHTML = '<span class="safe">所有威胁已被CCNB成功清除！</span>';
                     elements.warningBox.style.display = 'none';
-                    elements.safeBox.innerHTML = '<h3 class="safe">系统安全</h3><p>CCNB已成功清除所有检测到的威胁。</p><p>您的CC系统现在处于安全状态。</p>';
+                    elements.safeBox.innerHTML = '<h3 class="safe">系统安全</h3><p>CCNB已成功清除所有检测到的威胁。</p><p>您的系统现在处于安全状态。</p>';
                     elements.fixButtonContainer.style.display = 'none';
                     elements.rescanButtonContainer.style.display = 'block';
                     elements.refreshMessage.style.display = 'block';
