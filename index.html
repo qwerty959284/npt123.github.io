@@ -3,433 +3,556 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CC扫描 - 系统安全检测</title>
+    <title>CC扫描中心</title>
     <style>
-        body{font-family:'Segoe UI',Arial,sans-serif;background-color:#f0f0f0;margin:0;padding:0;color:#333;user-select:none}
-        .scanner-container{width:80%;max-width:800px;margin:50px auto;background-color:white;border-radius:5px;box-shadow:0 0 15px rgba(0,0,0,0.1);padding:20px;overflow:hidden;position:relative}
-        .header{background-color:#3498db;color:white;padding:15px;margin:-20px -20px 20px -20px;display:flex;align-items:center}
-        .header img{height:30px;margin-right:10px}
-        .progress-container{margin:20px 0}
-        .progress-bar{height:20px;background-color:#ecf0f1;border-radius:10px;overflow:hidden}
-        .progress{height:100%;width:0%;background-color:#3498db;transition:width 0.3s}
-        .scan-details{margin-top:20px;border-top:1px solid #eee;padding-top:20px;max-height:300px;overflow-y:auto}
-        .file-item{padding:8px 0;border-bottom:1px solid #f5f5f5;display:flex;justify-content:space-between}
-        .virus-found{color:#e74c3c;font-weight:bold}
-        .virus-cleaned{color:#2ecc71;font-weight:bold}
-        .btn{background-color:#3498db;color:white;border:none;padding:10px 20px;border-radius:5px;cursor:pointer;font-size:16px;margin-top:20px}
-        .btn-danger{background-color:#e74c3c}
-        .btn-success{background-color:#2ecc71}
-        .btn-warning{background-color:#f39c12}
-        .loading{display:inline-block;width:20px;height:20px;border:3px solid rgba(255,255,255,.3);border-radius:50%;border-top-color:#fff;animation:spin 1s ease-in-out infinite}
-        @keyframes spin{to{transform:rotate(360deg)}}
-        .alert{padding:15px;border-radius:5px;margin:20px 0;border:1px solid transparent}
-        .alert-danger{background-color:#f8d7da;color:#721c24;border-color:#f5c6cb}
-        .alert-info{background-color:#d1ecf1;color:#0c5460;border-color:#bee5eb}
-        .alert-success{background-color:#d4edda;color:#155724;border-color:#c3e6cb}
-        .alert-warning{background-color:#fff3cd;color:#856404;border-color:#ffeeba}
-        .ccnb-required{display:none;text-align:center;padding:20px}
-        .ccnb-logo{width:100px;height:100px;margin:20px auto;background-color:#2ecc71;border-radius:20px;display:flex;align-items:center;justify-content:center;color:white;font-size:24px;font-weight:bold}
-        .system-clean{text-align:center;padding:20px;color:#2ecc71;font-size:18px}
-        .refresh-message{text-align:center;padding:15px;margin:20px 0;background-color:#f8f9fa;border-radius:5px;border:1px solid #ddd}
-        .key-input{margin:15px 0;padding:10px;width:100%;border:1px solid #ddd;border-radius:4px}
-        .settings-btn{position:absolute;top:20px;right:20px;background:transparent;border:none;color:#7f8c8d;cursor:pointer;font-size:24px}
-        .settings-menu{display:none;position:absolute;top:50px;right:20px;background:white;border-radius:5px;box-shadow:0 0 10px rgba(0,0,0,0.1);padding:10px;z-index:100}
-        .settings-menu button{display:block;width:100%;padding:8px 12px;text-align:left;background:none;border:none;cursor:pointer}
-        .settings-menu button:hover{background-color:#f5f5f5}
-        #context-menu{display:none;position:fixed;background:white;border:1px solid #ddd;box-shadow:0 2px 5px rgba(0,0,0,0.2);z-index:1000}
-        #context-menu button{display:block;width:100%;padding:8px 15px;text-align:left;background:none;border:none;cursor:pointer}
-        #context-menu button:hover{background-color:#f5f5f5}
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            padding: 10px;
+            overflow: hidden;
+            font-size: 14px;
+        }
+        .scan-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #111;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 8px rgba(255,0,0,0.5);
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #333;
+        }
+        .logo {
+            width: 32px;
+            height: 32px;
+            margin-right: 10px;
+        }
+        .scan-progress {
+            height: 20px;
+            background-color: #222;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #0078d7;
+            transition: width 0.3s;
+        }
+        .threat-list {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .threat-item {
+            padding: 8px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            background-color: #222;
+            border-left: 3px solid #ff0000;
+            display: flex;
+            justify-content: space-between;
+        }
+        .threat-item.resolved {
+            border-left-color: #28a745;
+            opacity: 0.7;
+        }
+        .critical { color: #ff0000; font-weight: bold }
+        .safe { color: #28a745; font-weight: bold }
+        .warning-box, .safe-box {
+            padding: 10px;
+            margin: 15px 0;
+            font-size: 13px;
+        }
+        .warning-box {
+            background-color: #330000;
+            border: 1px solid #ff0000;
+        }
+        .safe-box {
+            background-color: #003300;
+            border: 1px solid #28a745;
+            display: none;
+        }
+        .button-container {
+            text-align: center;
+            margin: 15px 0;
+        }
+        .scan-button {
+            padding: 8px 20px;
+            font-size: 14px;
+            background-color: #0078d7;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .start-scan-btn { background-color: #28a745 }
+        .flashing { animation: flash 0.5s infinite alternate }
+        @keyframes flash { from { opacity:1 } to { opacity:0.5 } }
+        .notification, .safe-notification {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            width: 220px;
+            padding: 8px;
+            font-size: 12px;
+        }
+        .notification {
+            background-color: #330000;
+            border: 1px solid #ff0000;
+        }
+        .safe-notification {
+            background-color: #003300;
+            border: 1px solid #28a745;
+            display: none;
+        }
+        .install-section {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #222;
+            border-radius: 4px;
+            display: none;
+        }
+        .ccnb-logo {
+            text-align: center;
+            margin: 15px 0;
+        }
+        .cc-logo {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 8px;
+        }
+        .success-icon {
+            text-align: center;
+            font-size: 50px;
+            color: #28a745;
+            margin: 15px 0;
+            display: none;
+        }
+        .no-threats {
+            text-align: center;
+            padding: 20px;
+            color: #28a745;
+            display: none;
+        }
+        .refresh-message {
+            text-align: center;
+            margin-top: 15px;
+            color: #aaa;
+            font-size: 12px;
+        }
+        .key-input {
+            margin: 10px 0;
+            padding: 6px;
+            width: 100%;
+            font-size: 13px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+        }
+        .clear-data-btn {
+            position: fixed;
+            bottom: 8px;
+            left: 8px;
+            padding: 4px 8px;
+            background-color: #333;
+            color: #aaa;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        h1 { font-size: 18px; margin: 0 }
+        h2 { font-size: 16px; margin: 10px 0 }
+        h3 { font-size: 15px; margin: 8px 0 }
+        p { margin: 8px 0; font-size: 13px }
     </style>
 </head>
-<body oncontextmenu="return false;">
-    <div id="context-menu">
-        <button onclick="alert('右键功能已被禁用')">CCNB安全扫描</button>
-    </div>
-
-    <div class="scanner-container" id="scanner-ui">
-        <button class="settings-btn" id="settings-btn">⚙️</button>
-        <div class="settings-menu" id="settings-menu">
-            <button id="clear-data-btn">清除所有使用信息</button>
-        </div>
-
+<body>
+    <div class="scan-container">
+    <div class="footer-note">该网站由诚诚开发的mk系统提供</div>
         <div class="header">
-            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTI1NiA4QzExOSA4IDggMTE5IDggMjU2czExMSAyNDggMjQ4IDI0OCAyNDgtMTExIDI0OC0yNDhTMzkzIDggMjU2IDh6bTAgNDQ4Yy0xMTAuNSAwLTIwMC04OS41LTIwMC0yMDBTMTQ1LjUgNTYgMjU2IDU2czIwMCA4OS41IDIwMCAyMDAtODkuNSAyMDAtMjAwIDIwMHptMzMuOC0zMTkuNGMtMTAuMi0xMC4yLTI3LTEwLjItMzcuMiAwTDE2MCAzNTguN2wtMjguOC0yOC44Yy0xMC4yLTEwLjItMjctMTAuMi0zNy4yIDAtMTAuMiAxMC4yLTEwLjIgMjcgMCAzNy4ybDU2LjQgNTYuNGM1LjEgNS4xIDExLjggNy44IDE4LjkgNy44czEzLjgtMi43IDE4LjktNy44bDEyOC0xMjhjMTAuMi0xMC4yIDEwLjItMjcgMC0zNy4yeiIvPjwvc3ZnPg==" alt="Shield">
-            <h2>CC扫描 - 系统安全检测</h2>
+         <svg class="mk-icon" width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <path d="M50 5L10 30V70L50 95L90 70V30L50 5Z" fill="#2D3436"/>
+        <path d="M50 35L30 50V70L50 85L70 70V50L50 35Z" fill="#E84393"/>
+        <text x="50" y="65" font-family="Arial" font-size="30" font-weight="bold" text-anchor="middle" fill="white">MK</text>
+            <h1>CC扫描中心（请按下F11后使用该网站）</h1>
         </div>
-
-        <div class="progress-container">
-            <p>正在分析您的系统安全性...</p>
-            <div class="progress-bar">
-                <div class="progress" id="progress"></div>
+        
+        <h2>系统安全扫描</h2>
+        <p id="scanDescription">准备扫描您的计算机...</p>
+        
+        <div class="scan-progress">
+            <div class="progress-bar" id="progressBar" style="width:0%"></div>
+        </div>
+        
+        <div id="scanStatus">等待扫描启动...</div>
+        
+        <div class="threat-list" id="threatList"></div>
+        
+        <div class="no-threats" id="noThreats">
+            <h3 class="safe">✓ 未检测到任何威胁</h3>
+            <p>您的系统处于安全状态</p>
+        </div>
+        
+        <div class="warning-box" id="warningBox">
+            <h3 class="critical flashing">严重警告！</h3>
+            <p>检测到多个严重威胁！您的系统安全和个人数据面临风险！</p>
+            <p id="solutionText">必须安装CCNB安全升级包才能清除这些威胁！</p>
+        </div>
+        
+        <div class="safe-box" id="safeBox">
+            <h3 class="safe">安全状态</h3>
+            <p>您的系统已受到CCNB保护，可以立即修复检测到的威胁。</p>
+        </div>
+        
+        <div class="install-section" id="installSection">
+            <div class="ccnb-logo">
+                <h2>CCNB 安全升级包</h2>
+                     <svg class="ccnb-icon" width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#3498DB"/>
+                <stop offset="100%" stop-color="#2ECC71"/>
+            </linearGradient>
+        </defs>
+        <rect width="100" height="100" rx="20" fill="url(#gradient)"/>
+        <text x="50" y="65" font-family="Arial" font-size="40" font-weight="bold" text-anchor="middle" fill="white">CCNB</text>
+    </svg>
+        <text x="50" y="65" font-family="Arial" font-size="50" font-weight="bold" text-anchor="middle" fill="white">MK</text>
+                <p>CCNB安全升级是CC扫描中心的必要组件</p>
             </div>
-            <p id="status-text">准备扫描...</p>
+            
+            <div style="margin:15px 0">
+                <input type="text" id="activationKey" class="key-input" placeholder="请输入激活码">
+                <div id="keyError" style="color:#ff0000;font-size:11px;display:none">激活码错误，请重新输入</div>
+            </div>
+            
+            <div style="margin:15px 0">
+                <label>
+                    <input type="checkbox" id="agreeTerms" checked> 我接受CCNB安全协议
+                </label>
+            </div>
+            
+            <div class="button-container">
+                <button class="scan-button" id="installButton">立即安装CCNB安全升级</button>
+            </div>
         </div>
-
-        <div class="alert alert-danger" id="critical-alert" style="display:none">
-            <h3>⚠️ 安全警报！</h3>
-            <p id="alert-text">检测到多个高危安全威胁！系统完整性可能受损！</p>
+        
+        <div class="button-container" id="fixButtonContainer" style="display:none">
+            <button class="scan-button" id="fixButton" style="background-color:#28a745">立即修复威胁</button>
         </div>
-
-        <div class="alert alert-success" id="clean-alert" style="display:none">
-            <h3>✓ 系统安全</h3>
-            <p>未检测到安全威胁，您的系统是安全的。</p>
+        
+        <div class="button-container" id="startScanContainer">
+            <button class="scan-button start-scan-btn" id="startScanButton">开始扫描</button>
         </div>
-
-        <div class="alert alert-warning" id="reset-alert" style="display:none">
-            <h3>信息已清除</h3>
-            <p>所有使用信息已成功清除，请刷新页面。</p>
+        
+        <div class="success-icon" id="successIcon">✓</div>
+        
+        <div class="button-container" id="rescanButtonContainer" style="display:none;margin-top:15px">
+            <button class="scan-button" id="rescanButton">再次扫描</button>
         </div>
-
-        <div class="scan-details" id="scan-details"></div>
-        <div class="system-clean" id="system-clean" style="display:none">
-            <p>您的系统已经过全面扫描，未发现任何安全威胁。</p>
+        
+        <div class="refresh-message" id="refreshMessage" style="display:none">
+            请刷新网页后即可继续操作
         </div>
-
-        <div class="alert alert-info" id="ccnb-required" style="display:none">
-            <h3>需要 CCNB 安全核心</h3>
-            <p>检测到您的系统缺少必要的安全组件。要修复这些威胁，必须安装 CCNB 安全核心。</p>
-            <div class="ccnb-logo">CCNB</div>
-            <p>CCNB 安全核心提供实时防护和高级威胁清除功能。</p>
-            <input type="password" class="key-input" id="activation-key" placeholder="请输入激活密钥">
-            <button class="btn btn-success" id="install-ccnb">立即安装 CCNB</button>
-            <p style="font-size:12px;color:#777">未安装 CCNB 将无法使用完整安全功能</p>
-        </div>
-
-        <div class="refresh-message" id="refresh-message" style="display:none">
-            <p>CCNB 已成功安装！请刷新网页后即可继续操作。</p>
-        </div>
-
-        <button class="btn" id="start-btn">开始扫描</button>
-        <button class="btn btn-danger" id="fix-btn" style="display:none">立即修复威胁</button>
-        <button class="btn" id="rescan-btn" style="display:none">重新扫描</button>
-        <button class="btn btn-warning" id="reset-btn" style="display:none">清除使用信息</button>
     </div>
-
-    <div class="scanner-container" id="ccnb-installer" style="display:none">
-        <div class="header" style="background-color:#2ecc71">
-            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiwyQTEwLDEwIDAgMCwwIDIsMTJBMTAsMTAgMCAwLDAgMTIsMjJBMTAsMTAgMCAwLDAgMjIsMTJBMTAsMTAgMCAwLDAgMTIsMk0xMCwxN0wxNSwxMkwxMCw3VjE3WiIgLz48L3N2Zz4=" alt="CCNB Logo">
-            <h2>CCNB 安全核心安装</h2>
-        </div>
-
-        <div class="alert alert-info">
-            <h3>正在安装 CCNB 安全核心</h3>
-            <p>此过程可能需要几分钟时间，请勿关闭窗口。</p>
-        </div>
-
-        <div class="progress-container">
-            <div class="progress-bar">
-                <div class="progress" id="ccnb-progress"></div>
-            </div>
-            <p id="ccnb-status-text">准备安装...</p>
-        </div>
-
-        <div id="ccnb-file-progress"></div>
-        <button class="btn btn-success" id="ccnb-complete-btn" style="display:none">完成安装</button>
+    
+    <button class="clear-data-btn" id="clearDataBtn">清除使用痕迹</button>
+    
+    <div class="notification" id="notification">
+        <strong>CC安全警报</strong>
+        <p>您的系统已感染！立即安装CCNB！</p>
+    </div>
+    
+    <div class="safe-notification" id="safeNotification">
+        <strong>CC安全通知</strong>
+        <p>CCNB已保护您的系统安全</p>
     </div>
 
     <script>
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-            const contextMenu = document.getElementById('context-menu');
-            contextMenu.style.display = 'block';
-            contextMenu.style.left = e.pageX + 'px';
-            contextMenu.style.top = e.pageY + 'px';
-        });
+        const systemState = {
+            ccnbInstalled: localStorage.getItem('ccnbInstalled') === 'true',
+            threatsFixed: localStorage.getItem('threatsFixed') === 'true'
+        };
+        
+        const threats = [
+            {name:"Trojan:CC32/Wacatac.B!ml",severity:"严重",type:"特洛伊木马",description:"此程序会窃取您的CC账户信息"},
+            {name:"Ransom:CC32/StopCrypt",severity:"严重",type:"勒索软件",description:"此程序会加密您的CC系统文件"},
+            {name:"PUA:CC32/CoinMiner",severity:"高",type:"加密货币挖矿程序",description:"此程序会消耗CC系统资源"},
+            {name:"Exploit:JS/CCLeak",severity:"高",type:"漏洞利用",description:"此程序试图利用CC系统漏洞"}
+        ];
 
-        document.addEventListener('click', function() {
-            document.getElementById('context-menu').style.display = 'none';
-            document.getElementById('settings-menu').style.display = 'none';
-        });
+        const elements = {
+            progressBar: document.getElementById('progressBar'),
+            scanStatus: document.getElementById('scanStatus'),
+            scanDescription: document.getElementById('scanDescription'),
+            threatList: document.getElementById('threatList'),
+            noThreats: document.getElementById('noThreats'),
+            installSection: document.getElementById('installSection'),
+            installButton: document.getElementById('installButton'),
+            fixButtonContainer: document.getElementById('fixButtonContainer'),
+            fixButton: document.getElementById('fixButton'),
+            rescanButtonContainer: document.getElementById('rescanButtonContainer'),
+            rescanButton: document.getElementById('rescanButton'),
+            warningBox: document.getElementById('warningBox'),
+            safeBox: document.getElementById('safeBox'),
+            solutionText: document.getElementById('solutionText'),
+            notification: document.getElementById('notification'),
+            safeNotification: document.getElementById('safeNotification'),
+            successIcon: document.getElementById('successIcon'),
+            refreshMessage: document.getElementById('refreshMessage'),
+            activationKey: document.getElementById('activationKey'),
+            keyError: document.getElementById('keyError'),
+            clearDataBtn: document.getElementById('clearDataBtn'),
+            startScanButton: document.getElementById('startScanButton'),
+            startScanContainer: document.getElementById('startScanContainer')
+        };
 
-        const hasInstalledCCNB=localStorage.getItem('ccnbInstalled')==='true';
-        const hasFixedThreats=localStorage.getItem('threatsFixed')==='true';
-        const hasScannedOnce=localStorage.getItem('hasScannedOnce')==='true';
-        const files=["系统核心/kernel32.dll","程序文件/system.dll","用户文档/财务报告.xlsx","下载/game_mod.exe","系统驱动/network.sys","启动项/startup.dll","图片/证件照.jpg","音乐/个人录音.mp3","系统配置/SYSTEM","桌面/重要文件.doc"];
-        const threats=["Trojan.Generic","Backdoor.Bladabindi","Exploit.LSASS","Vulnerability.CVE-2023","Ransomware.Cry","Spyware.Keylogger","Adware.Popup","Virus.Neshta","Worm.Network","Rootkit.TDSS"];
-        const ccnbFiles=["CCNB_Core.sys","CCNB_Security.exe","ThreatDefinitions.db","RealTimeProtection.dll","FirewallEngine.exe","UI_Components","Configuration","ResourcePack"];
-        const CORRECT_KEY="198245";
-
-        const startBtn=document.getElementById('start-btn');
-        const fixBtn=document.getElementById('fix-btn');
-        const rescanBtn=document.getElementById('rescan-btn');
-        const resetBtn=document.getElementById('reset-btn');
-        const installCcnbBtn=document.getElementById('install-ccnb');
-        const ccnbCompleteBtn=document.getElementById('ccnb-complete-btn');
-        const progress=document.getElementById('progress');
-        const ccnbProgress=document.getElementById('ccnb-progress');
-        const statusText=document.getElementById('status-text');
-        const ccnbStatusText=document.getElementById('ccnb-status-text');
-        const scanDetails=document.getElementById('scan-details');
-        const ccnbFileProgress=document.getElementById('ccnb-file-progress');
-        const criticalAlert=document.getElementById('critical-alert');
-        const cleanAlert=document.getElementById('clean-alert');
-        const resetAlert=document.getElementById('reset-alert');
-        const systemClean=document.getElementById('system-clean');
-        const refreshMessage=document.getElementById('refresh-message');
-        const alertText=document.getElementById('alert-text');
-        const ccnbRequired=document.getElementById('ccnb-required');
-        const scannerUI=document.getElementById('scanner-ui');
-        const ccnbInstaller=document.getElementById('ccnb-installer');
-        const activationKey=document.getElementById('activation-key');
-        const settingsBtn=document.getElementById('settings-btn');
-        const settingsMenu=document.getElementById('settings-menu');
-        const clearDataBtn=document.getElementById('clear-data-btn');
-
-        function initUI(){
-            criticalAlert.style.display='none';
-            cleanAlert.style.display='none';
-            resetAlert.style.display='none';
-            systemClean.style.display='none';
-            ccnbRequired.style.display='none';
-            refreshMessage.style.display='none';
-            scanDetails.innerHTML='';
-            if(hasInstalledCCNB){
-                if(hasFixedThreats){
-                    systemClean.style.display='block';
-                    cleanAlert.style.display='block';
-                    rescanBtn.style.display='inline-block';
-                    startBtn.style.display='none';
-                    fixBtn.style.display='none';
-                    resetBtn.style.display='inline-block';
-                }else{
-                    startBtn.style.display='inline-block';
-                    fixBtn.style.display='none';
-                    rescanBtn.style.display='none';
-                    resetBtn.style.display='inline-block';
-                }
-            }else{
-                startBtn.style.display='inline-block';
-                fixBtn.style.display='none';
-                rescanBtn.style.display='none';
-                resetBtn.style.display='none';
+        function initUI() {
+            if (systemState.threatsFixed) {
+                elements.scanDescription.textContent = "准备使用CCNB扫描您的计算机...";
+                elements.noThreats.style.display = "block";
+                elements.threatList.style.display = "none";
+                elements.warningBox.style.display = "none";
+                elements.safeBox.style.display = "block";
+                elements.safeBox.innerHTML = '<h3 class="safe">系统安全</h3><p>CCNB已保护您的系统安全。</p><p>上次扫描未发现任何威胁。</p>';
+                elements.rescanButtonContainer.style.display = "block";
+                elements.startScanContainer.style.display = "none";
+            } else if (systemState.ccnbInstalled) {
+                elements.scanDescription.textContent = "准备使用CCNB扫描您的计算机...";
+                elements.solutionText.textContent = "CCNB已安装，可以立即修复这些威胁！";
+                elements.fixButtonContainer.style.display = "none";
+                elements.safeBox.style.display = "block";
+                elements.warningBox.style.display = "none";
+                elements.rescanButtonContainer.style.display = "none";
+                elements.startScanContainer.style.display = "block";
+            } else {
+                elements.scanDescription.textContent = "准备扫描您的计算机以查找威胁...";
+                elements.installSection.style.display = "none";
+                elements.fixButtonContainer.style.display = "none";
+                elements.warningBox.style.display = "none";
+                elements.safeBox.style.display = "none";
+                elements.rescanButtonContainer.style.display = "none";
+                elements.startScanContainer.style.display = "block";
             }
         }
 
-        initUI();
-
-        settingsBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            settingsMenu.style.display = settingsMenu.style.display === 'block' ? 'none' : 'block';
-        });
-
-        clearDataBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            clearUserData();
-            settingsMenu.style.display = 'none';
-        });
-
-        resetBtn.addEventListener('click', function() {
-            clearUserData();
-        });
-
-        function clearUserData() {
-            try {
-                localStorage.removeItem('ccnbInstalled');
-                localStorage.removeItem('threatsFixed');
-                localStorage.removeItem('hasScannedOnce');
-                
-                resetAlert.style.display='block';
-                criticalAlert.style.display='none';
-                cleanAlert.style.display='none';
-                systemClean.style.display='none';
-                ccnbRequired.style.display='none';
-                refreshMessage.style.display='none';
-                scanDetails.innerHTML='';
-                startBtn.style.display='inline-block';
-                fixBtn.style.display='none';
-                rescanBtn.style.display='none';
-                resetBtn.style.display='none';
-                
-            } catch (error) {
-                alert('清除失败: ' + error.message);
-            }
-        }
-
-        startBtn.addEventListener('click',startScan);
-        fixBtn.addEventListener('click',fixThreats);
-        rescanBtn.addEventListener('click',startScan);
-        installCcnbBtn.addEventListener('click',installCCNB);
-        ccnbCompleteBtn.addEventListener('click',completeCCNBInstallation);
-
-        function startScan(){
-            startBtn.disabled=true;
-            rescanBtn.disabled=true;
-            startBtn.innerHTML='<span class="loading"></span> 扫描中...';
-            criticalAlert.style.display='none';
-            cleanAlert.style.display='none';
-            resetAlert.style.display='none';
-            systemClean.style.display='none';
-            ccnbRequired.style.display='none';
-            refreshMessage.style.display='none';
-            scanDetails.innerHTML='';
-            fixBtn.style.display='none';
-            rescanBtn.style.display='none';
-            resetBtn.style.display='none';
+        function startScan() {
+            elements.startScanButton.disabled = true;
+            elements.startScanButton.textContent = "扫描中...";
+            elements.scanDescription.textContent = "正在扫描您的计算机以查找威胁...";
             
-            // 标记为已扫描过
-            localStorage.setItem('hasScannedOnce', 'true');
-            
-            let progressValue=0;
-            const interval=setInterval(()=>{
-                progressValue+=Math.random()*5;
-                if(progressValue>100)progressValue=100;
-                progress.style.width=progressValue+'%';
-                if(progressValue<30){
-                    statusText.textContent="扫描系统核心组件...";
-                }else if(progressValue<60){
-                    statusText.textContent="检查用户文件...";
-                }else if(progressValue<90){
-                    statusText.textContent="分析潜在威胁...";
-                }else{
-                    statusText.textContent="完成安全检查...";
-                }
+            let progress = 0;
+            const scanInterval = setInterval(() => {
+                progress += Math.random() * 5;
+                if (progress > 100) progress = 100;
+                elements.progressBar.style.width = progress + '%';
                 
-                // 如果已经扫描过一次，就不再显示病毒
-                if(!hasScannedOnce && !hasFixedThreats && progressValue>20 && progressValue<90 && Math.random()>0.7){
-                    addScanResult(false);
-                }
-                
-                if(progressValue===100){
-                    clearInterval(interval);
-                    completeScan();
-                }
-            },300);
-        }
-
-        function addScanResult(isCleaned){
-            const isThreat=!hasScannedOnce && !hasFixedThreats && Math.random()>0.4;
-            const randomFile=files[Math.floor(Math.random()*files.length)];
-            const randomThreat=threats[Math.floor(Math.random()*threats.length)];
-            const item=document.createElement('div');
-            item.className='file-item';
-            if(isThreat){
-                if(isCleaned){
-                    item.innerHTML=`<span>${randomFile}</span><span class="virus-cleaned">${randomThreat} 已清除!</span>`;
-                }else{
-                    item.innerHTML=`<span>${randomFile}</span><span class="virus-found">${randomThreat} 检测到!</span>`;
-                }
-            }else{
-                item.innerHTML=`<span>${randomFile}</span><span>安全</span>`;
-            }
-            scanDetails.appendChild(item);
-            scanDetails.scrollTop=scanDetails.scrollHeight;
-        }
-
-        function completeScan(){
-            statusText.textContent="扫描完成！";
-            
-            if(hasFixedThreats || hasScannedOnce){
-                cleanAlert.style.display='block';
-                systemClean.style.display='block';
-                rescanBtn.style.display='inline-block';
-                rescanBtn.disabled=false;
-                resetBtn.style.display='inline-block';
-                scanDetails.innerHTML='';
-                for(let i=0;i<files.length;i++){
-                    const item=document.createElement('div');
-                    item.className='file-item';
-                    item.innerHTML=`<span>${files[i]}</span><span>安全</span>`;
-                    scanDetails.appendChild(item);
-                }
-            }else{
-                if(scanDetails.children.length===0){
-                    cleanAlert.style.display='block';
-                    systemClean.style.display='block';
-                    rescanBtn.style.display='inline-block';
-                    rescanBtn.disabled=false;
-                    resetBtn.style.display='inline-block';
-                }else{
-                    criticalAlert.style.display='block';
-                    if(hasInstalledCCNB){
-                        fixBtn.style.display='inline-block';
-                        startBtn.style.display='none';
-                        resetBtn.style.display='inline-block';
-                    }else{
-                        ccnbRequired.style.display='block';
-                        startBtn.style.display='none';
-                        resetBtn.style.display='none';
+                if (progress < 20) {
+                    elements.scanStatus.textContent = "正在检查CC系统文件...";
+                } else if (progress < 40) {
+                    elements.scanStatus.textContent = "正在扫描CC内存进程...";
+                    if (!systemState.threatsFixed && elements.threatList.children.length === 0 && !systemState.ccnbInstalled) {
+                        showThreats();
                     }
+                } else if (progress < 60) {
+                    elements.scanStatus.textContent = "正在分析CC注册表项...";
+                } else if (progress < 80) {
+                    elements.scanStatus.textContent = "正在评估CC威胁级别...";
+                } else {
+                    elements.scanStatus.textContent = "正在完成CC安全评估...";
                 }
+                
+                if (progress === 100) {
+                    clearInterval(scanInterval);
+                    scanComplete();
+                }
+            }, 300);
+        }
+
+        function showThreats() {
+            threats.forEach((threat, index) => {
+                setTimeout(() => {
+                    const threatItem = document.createElement('div');
+                    threatItem.className = 'threat-item';
+                    threatItem.innerHTML = `<div><strong>${threat.name}</strong><br><span>严重性: <span class="critical">${threat.severity}</span> | 类型: ${threat.type}</span></div><div>${threat.description}</div>`;
+                    elements.threatList.appendChild(threatItem);
+                    
+                    if (Math.random() > 0.7) {
+                        showNotification(threat.name);
+                    }
+                }, index * 800);
+            });
+        }
+
+        function showNotification(threatName) {
+            if (systemState.threatsFixed) {
+                elements.safeNotification.innerHTML = `<strong>CC安全通知</strong><p>未检测到任何威胁</p><p>您的系统处于安全状态</p>`;
+                elements.safeNotification.style.display = 'block';
+                setTimeout(() => { elements.safeNotification.style.display = 'none' }, 3000);
+            } else if (systemState.ccnbInstalled) {
+                elements.safeNotification.innerHTML = `<strong>CC安全通知</strong><p>检测到: ${threatName}</p><p>CCNB可以修复此威胁</p>`;
+                elements.safeNotification.style.display = 'block';
+                setTimeout(() => { elements.safeNotification.style.display = 'none' }, 3000);
+            } else {
+                elements.notification.innerHTML = `<strong>CC安全警报</strong><p>检测到: ${threatName}</p><p>必须安装CCNB才能清除！</p>`;
+                elements.notification.style.display = 'block';
+                setTimeout(() => { elements.notification.style.display = 'none' }, 3000);
             }
         }
 
-        function fixThreats(){
-            fixBtn.disabled=true;
-            fixBtn.innerHTML='<span class="loading"></span> 修复中...';
-            alertText.textContent="正在清除安全威胁，请稍候...";
-            setTimeout(()=>{
-                localStorage.setItem('threatsFixed','true');
-                scanDetails.innerHTML='';
-                for(let i=0;i<files.length;i++){
-                    const item=document.createElement('div');
-                    item.className='file-item';
-                    item.innerHTML=`<span>${files[i]}</span><span>安全</span>`;
-                    scanDetails.appendChild(item);
+        function scanComplete() {
+            elements.startScanContainer.style.display = "none";
+            
+            if (systemState.threatsFixed) {
+                elements.scanStatus.innerHTML = '<span class="safe">CCNB扫描完成！未检测到任何威胁！</span>';
+                elements.noThreats.style.display = "block";
+                elements.threatList.style.display = "none";
+                elements.safeNotification.style.display = 'block';
+                setTimeout(() => { elements.safeNotification.style.display = 'none' }, 3000);
+                elements.rescanButtonContainer.style.display = "block";
+            } else if (systemState.ccnbInstalled) {
+                if (!systemState.threatsFixed) {
+                    elements.scanStatus.innerHTML = '<span class="safe">CCNB扫描完成！检测到可修复的威胁！</span>';
+                    elements.safeNotification.style.display = 'block';
+                    elements.fixButtonContainer.style.display = "block";
+                } else {
+                    elements.scanStatus.innerHTML = '<span class="safe">CCNB扫描完成！未检测到任何威胁！</span>';
+                    elements.noThreats.style.display = "block";
+                    elements.threatList.style.display = "none";
+                    elements.rescanButtonContainer.style.display = "block";
                 }
-                criticalAlert.style.display='none';
-                cleanAlert.style.display='block';
-                systemClean.style.display='block';
-                fixBtn.style.display='none';
-                rescanBtn.style.display='inline-block';
-                rescanBtn.disabled=false;
-                resetBtn.style.display='inline-block';
-            },2000);
+            } else {
+                elements.scanStatus.innerHTML = '<span class="critical">CC扫描完成！检测到多个严重威胁！</span>';
+                elements.installSection.style.display = 'block';
+            }
         }
 
-        function installCCNB(){
-            if(activationKey.value!==CORRECT_KEY){
-                alert('激活密钥错误，请输入正确的密钥！');
+        elements.startScanButton.addEventListener('click', startScan);
+        
+        elements.installButton.addEventListener('click', function() {
+            if (!document.getElementById('agreeTerms').checked) {
+                alert('您必须接受CCNB安全协议才能继续安装！');
                 return;
             }
-            scannerUI.style.display='none';
-            ccnbInstaller.style.display='block';
-            let progressValue=0;
-            let currentFile=0;
-            const interval=setInterval(()=>{
-                progressValue+=Math.random()*5;
-                if(progressValue>100)progressValue=100;
-                ccnbProgress.style.width=progressValue+'%';
-                if(progressValue<20){
-                    ccnbStatusText.textContent="准备安装组件...";
-                }else if(progressValue<40){
-                    ccnbStatusText.textContent="安装安全引擎...";
-                }else if(progressValue<60){
-                    ccnbStatusText.textContent="注册防护模块...";
-                }else if(progressValue<80){
-                    ccnbStatusText.textContent="更新威胁数据库...";
-                }else{
-                    ccnbStatusText.textContent="完成安全配置...";
-                }
-                if(currentFile<ccnbFiles.length&&Math.random()>0.7){
-                    const fileItem=document.createElement('div');
-                    fileItem.className='file-item';
-                    fileItem.textContent=`正在安装: ${ccnbFiles[currentFile]}`;
-                    ccnbFileProgress.appendChild(fileItem);
-                    ccnbFileProgress.scrollTop=ccnbFileProgress.scrollHeight;
-                    currentFile++;
-                }
-                if(progressValue===100){
-                    clearInterval(interval);
-                    ccnbCompleteBtn.style.display='inline-block';
-                }
-            },300);
-        }
-
-        function completeCCNBInstallation(){
-            localStorage.setItem('ccnbInstalled','true');
-            scannerUI.style.display='block';
-            ccnbInstaller.style.display='none';
-            criticalAlert.style.display='none';
-            cleanAlert.style.display='none';
-            systemClean.style.display='none';
-            ccnbRequired.style.display='none';
-            scanDetails.innerHTML='';
-            startBtn.style.display='none';
-            fixBtn.style.display='none';
-            rescanBtn.style.display='none';
-            resetBtn.style.display='none';
-            refreshMessage.style.display='block';
-        }
+            if (elements.activationKey.value !== "198245") {
+                elements.keyError.style.display = "block";
+                return;
+            }
+            elements.keyError.style.display = "none";
+            elements.scanStatus.innerHTML = '<span class="critical">正在下载CCNB安全升级...</span>';
+            elements.installButton.disabled = true;
+            elements.installButton.textContent = "安装中...";
+            
+            setTimeout(() => {
+                elements.scanStatus.innerHTML = '<span class="critical">正在安装CCNB安全组件...</span>';
+                setTimeout(() => {
+                    elements.scanStatus.innerHTML = '<span class="critical">正在配置CC系统安全设置...</span>';
+                    setTimeout(() => {
+                        systemState.ccnbInstalled = true;
+                        localStorage.setItem('ccnbInstalled', 'true');
+                        document.body.innerHTML = `<div style="text-align:center;padding-top:80px;color:#fff;background:#000;height:100vh;font-size:14px">    <svg class="ccnb-icon" width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#3498DB"/>
+                <stop offset="100%" stop-color="#2ECC71"/>
+            </linearGradient>
+        </defs>
+        <rect width="100" height="100" rx="20" fill="url(#gradient)"/>
+        <text x="50" y="65" font-family="Arial" font-size="40" font-weight="bold" text-anchor="middle" fill="white">CCNB</text>
+    </svg><h1 style="font-size:36px;color:#28a745">✓ CCNB安全升级完成</h1><p style="font-size:20px">CCNB已成功安装！</p><p>请刷新网页后即可继续操作</p></div>`;
+                    }, 3000);
+                }, 3000);
+            }, 3000);
+        });
+        
+        elements.fixButton.addEventListener('click', function() {
+            elements.fixButton.disabled = true;
+            elements.fixButton.textContent = "修复中...";
+            elements.scanStatus.innerHTML = '<span class="safe">正在使用CCNB修复威胁...</span>';
+            
+            setTimeout(() => {
+                systemState.threatsFixed = true;
+                localStorage.setItem('threatsFixed', 'true');
+                
+                const threatItems = document.querySelectorAll('.threat-item');
+                threatItems.forEach(item => {
+                    item.classList.add('resolved');
+                    const severitySpan = item.querySelector('.critical');
+                    if (severitySpan) {
+                        severitySpan.textContent = "已解决";
+                        severitySpan.className = "safe";
+                    }
+                });
+                
+                setTimeout(() => {
+                    elements.successIcon.style.display = 'block';
+                    elements.scanStatus.innerHTML = '<span class="safe">所有威胁已被CCNB成功清除！</span>';
+                    elements.warningBox.style.display = 'none';
+                    elements.safeBox.innerHTML = '<h3 class="safe">系统安全</h3><p>CCNB已成功清除所有检测到的威胁。</p><p>您的CC系统现在处于安全状态。</p>';
+                    elements.fixButtonContainer.style.display = 'none';
+                    elements.rescanButtonContainer.style.display = 'block';
+                    elements.refreshMessage.style.display = 'block';
+                    
+                    elements.safeNotification.innerHTML = '<strong>CC安全通知</strong><p>所有威胁已被成功清除！</p>';
+                    elements.safeNotification.style.display = 'block';
+                    setTimeout(() => { elements.safeNotification.style.display = 'none' }, 3000);
+                }, 2000);
+            }, 3000);
+        });
+        
+        elements.rescanButton.addEventListener('click', function() {
+            elements.progressBar.style.width = '0%';
+            elements.scanStatus.textContent = "等待扫描启动...";
+            elements.scanDescription.textContent = "准备扫描您的计算机...";
+            elements.successIcon.style.display = 'none';
+            elements.noThreats.style.display = 'none';
+            elements.rescanButtonContainer.style.display = 'none';
+            elements.refreshMessage.style.display = 'none';
+            elements.startScanContainer.style.display = 'block';
+            elements.startScanButton.disabled = false;
+            elements.startScanButton.textContent = "开始扫描";
+        });
+        
+        elements.clearDataBtn.addEventListener('click', function() {
+            if (confirm('确定要清除所有使用痕迹吗？这将重置CCNB扫描中心')) {
+                localStorage.removeItem('ccnbInstalled');
+                localStorage.removeItem('threatsFixed');
+                location.reload();
+            }
+        });
+        
+        initUI();
+        
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            alert('CC安全策略禁止此操作');
+            return false;
+        });
+        
+        document.onkeydown = function(e) {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I') || 
+                (e.ctrlKey && e.shiftKey && e.key === 'J') || (e.ctrlKey && e.key === 'U')) {
+                alert('CC安全策略禁止此操作');
+                return false;
+            }
+        };
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                alert('CC安全策略禁止此操作');
+                return false;
+            }
+        });
     </script>
 </body>
 </html>
